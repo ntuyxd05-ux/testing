@@ -30953,4 +30953,41 @@ right.MouseButton1Down:connect(function()FlipPage(1) end)
 left.MouseButton1Down:connect(function()FlipPage(-1) end)
 page1.addonl.MouseButton1Down:connect(function()CurrentPage=6 FlipPage(-1) end)
 page5.addonr.MouseButton1Down:connect(function()CurrentPage=0 FlipPage(1) end)
+
+-- Original script tetap dipertahankan, hanya ditambahkan fitur draggable UI
+-- Dragging diaktifkan lewat Title bar Settings agar lebih natural
+
+-- ✦ Tambahan: fungsi untuk membuat frame bisa digeser ✦
+local UserInputService = game:GetService("UserInputService")
+
+local function makeDraggable(frame, dragHandle)
+    local dragToggle, dragStart, startPos
+
+    dragHandle.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragToggle = true
+            dragStart = input.Position
+            startPos = frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragToggle = false
+                end
+            end)
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragToggle and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(
+                startPos.X.Scale, startPos.X.Offset + delta.X,
+                startPos.Y.Scale, startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+end
+
+-- Aktifkan draggable pada frame utama melalui Title bar Settings
+-- Pastikan "frame" dan "title" sudah ada di script asli
+makeDraggable(frame, title)																																					
 -----------------------------------------------------------------------------
